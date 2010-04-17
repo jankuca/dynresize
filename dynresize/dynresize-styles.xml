@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="http://dtd.blackpig.cz/dynresize10.css" type="text/css"?>
+<!DOCTYPE dynresize PUBLIC "-//LookSmog//DTD DynResize 1.0//EN" "http://dtd.blackpig.cz/dynresize10.dtd">
+
+<dynresize>
+	<style codename="default">
+		<types>
+			<type codename="small">
+				<height>80</height>
+				<quality>90</quality>
+			</type>
+			<type codename="medium">
+				<height>126</height>
+				<quality>90</quality>
+			</type>
+			<type codename="large">
+				<width>768</width>
+				<quality>100</quality>
+			</type>
+		</types>
+	</style>
+</dynresize>

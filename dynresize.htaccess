@@ -1,0 +1,3 @@
+RewriteEngine On
+#RewriteBase /
+RewriteRule ^image/([\w-]+)/(.+)$ dynresize.php?type=$1&path=$2
