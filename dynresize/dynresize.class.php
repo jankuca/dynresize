@@ -27,6 +27,7 @@ class DynResize
 		if(!defined('DYNRESIZE_ERROR_LINECOLOR'))	define('DYNRESIZE_ERROR_LINECOLOR','#FDDBD8');
 		if(!defined('DYNRESIZE_CACHE'))				define('DYNRESIZE_CACHE',true);
 		if(!defined('DYNRESIZE_CACHEDIR'))			define('DYNRESIZE_CACHEDIR','./dynresize/cache/');
+		if(!defined('DYNRESIZE_SCALEUP'))			define('DYNRESIZE_SCALEUP',false);
 
 		if(!isset($_GET['path']) && !defined('DYNRESIZE_ERROR')) define('DYNRESIZE_ERROR',true);
 
@@ -48,11 +49,6 @@ class DynResize
 		$this->checkSource();
 		$this->getSourceSize();
 		$this->getOutputSize();
-		/**
-		* ADDED IN revision 3
-		* REMOVED IN revision 4
-		$this->compareSizes();
-		*/
 		if(DYNRESIZE_CACHE) $this->checkCache(); // Check whether the image has not been already generated. If it has, read the cached image.
 		$this->loadSource();
 		$this->loadOutput();
@@ -62,19 +58,6 @@ class DynResize
 		if(isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] != '127.0.0.1') $this->IUseDynResize();
 		$this->output();
 	}
-
-	/**
-	* ADDED IN revision 3
-	* REMOVED IN revision 4
-	private function compareSizes()
-	{
-		if(!defined('DYNRESIZE_ERROR') && $this->size['source'][0] == $this->size['output'][0] && $this->size['source'][1] == $this->size['output'][1])
-		{
-			header('Location: '.$_GET['path']);
-			exit();
-		}
-	}
-	*/
 
 	private function checkCache()
 	{
@@ -86,7 +69,9 @@ class DynResize
 				else $this->cfg['cache'] = 'nocache';
 			}
 			else
-				$this->cfg['cache'] = DYNRESIZE_CACHEDIR . basename($this->cfg['path']) . '.' . md5($this->cfg['path']) . '.' . $this->size['output'][0] . 'x' . $this->size['output'][1] . '.jpg';
+			{
+				$this->cfg['cache'] = DYNRESIZE_CACHEDIR . basename($this->cfg['path']) . '.' . hash_file('md5',DYNRESIZE_ROOT . $this->cfg['path']) . '.' . $this->size['output'][0] . 'x' . $this->size['output'][1] . '.jpg';
+			}
 
 			if(file_exists($this->cfg['cache']))
 			{
@@ -246,7 +231,10 @@ class DynResize
 			case(1):
 				if($this->type != NULL)
 				{
-					if(!isset($this->type->width[0]) && !isset($this->type->height[0]) && !defined('DYNRESIZE_ERROR')) define('DYNRESIZE_ERROR',true);
+					if(!isset($this->type->width[0]) && !isset($this->type->height[0]) && !defined('DYNRESIZE_ERROR'))
+					{
+						define('DYNRESIZE_ERROR',true);
+					}
 					elseif(isset($this->type->width[0],$this->type->height[0]))
 					{
 						$this->size['output'][0] = (int) $this->type->width[0];
@@ -297,7 +285,7 @@ class DynResize
 	}
 
 	private function getOutputWidth($height)
-	{//throw new Exception('ddd');
+	{
 		if($this->size['source'][1] == NULL) return(256);
 		return(floor(($this->size['source'][0] * $height) / $this->size['source'][1]));
 	}
@@ -338,11 +326,14 @@ class DynResize
 						$this->size['resized'] = array($this->getOutputWidth($this->size['output'][1]),$this->size['output'][1]);
 						$this->size['resized'][2] = array(($this->getOutputHeight($this->size['output'][0]) - $this->size['output'][1]) / 2,0);
 
-						// Check whether the source height is not smaller than the resized source height.
-						if($this->size['source'][1] < $this->size['resized'][1])
+						if(!DYNRESIZE_SCALEUP)
 						{
-							$this->size['resized'] = array($this->size['source'][0],$this->size['source'][1]);
-							$this->size['resized'][2] = array(($this->size['output'][0] - $this->size['source'][0]) / 2,($this->size['output'][1] - $this->size['source'][1]) / 2);
+							// Check whether the source height is not smaller than the resized source height.
+							if($this->size['source'][1] < $this->size['resized'][1])
+							{
+								$this->size['resized'] = array($this->size['source'][0],$this->size['source'][1]);
+								$this->size['resized'][2] = array(($this->size['output'][0] - $this->size['source'][0]) / 2,($this->size['output'][1] - $this->size['source'][1]) / 2);
+							}
 						}
 					}
 					else
@@ -350,11 +341,14 @@ class DynResize
 						$this->size['resized'] = array($this->size['output'][0],$this->getOutputHeight($this->size['output'][0]));
 						$this->size['resized'][2] = array(0,($this->getOutputWidth($this->size['output'][1]) - $this->size['output'][0]) / 2);
 
-						// Check whether the source width is not smaller than the resized source width.
-						if($this->size['source'][0] < $this->size['resized'][0])
+						if(!DYNRESIZE_SCALEUP)
 						{
-							$this->size['resized'] = array($this->size['source'][0],$this->size['source'][1]);
-							$this->size['resized'][2] = array(($this->size['output'][0] - $this->size['source'][0]) / 2,($this->size['output'][1] - $this->size['source'][1]) / 2);
+							// Check whether the source width is not smaller than the resized source width.
+							if($this->size['source'][0] < $this->size['resized'][0])
+							{
+								$this->size['resized'] = array($this->size['source'][0],$this->size['source'][1]);
+								$this->size['resized'][2] = array(($this->size['output'][0] - $this->size['source'][0]) / 2,($this->size['output'][1] - $this->size['source'][1]) / 2);
+							}
 						}
 					}
 				}
