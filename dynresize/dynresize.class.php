@@ -27,7 +27,7 @@ class DynResize
 		if(!defined('DYNRESIZE_ERROR_LINECOLOR'))	define('DYNRESIZE_ERROR_LINECOLOR','#FDDBD8');
 		if(!defined('DYNRESIZE_CACHE'))				define('DYNRESIZE_CACHE',true);
 		if(!defined('DYNRESIZE_CACHEDIR'))			define('DYNRESIZE_CACHEDIR','./dynresize/cache/');
-		if(!defined('DYNRESIZE_SCALEUP'))			define('DYNRESIZE_SCALEUP',false);
+		if(!defined('DYNRESIZE_UPSCALE'))			define('DYNRESIZE_UPSCALE',false);
 
 		if(!isset($_GET['path']) && !defined('DYNRESIZE_ERROR')) define('DYNRESIZE_ERROR',true);
 
@@ -65,12 +65,12 @@ class DynResize
 		{
 			if(defined('DYNRESIZE_EXTERNAL_IMAGE') && DYNRESIZE_EXTERNAL_IMAGE)
 			{
-				if(DYNRESIZE_EXTERNAL_CACHE) $this->cfg['cache'] = DYNRESIZE_EXTERNAL_CACHEDIR . md5($this->cfg['path']) . '.' . $this->size['output'][0] . 'x' . $this->size['output'][1] . '.jpg';
+				if(DYNRESIZE_EXTERNAL_CACHE) $this->cfg['cache'] = DYNRESIZE_EXTERNAL_CACHEDIR . md5($this->cfg['path']) . '.' . $this->size['output'][0] . 'x' . $this->size['output'][1] . (DYNRESIZE_UPSCALE ? '.upscale' : '') . '.jpg';
 				else $this->cfg['cache'] = 'nocache';
 			}
 			else
 			{
-				$this->cfg['cache'] = DYNRESIZE_CACHEDIR . basename($this->cfg['path']) . '.' . hash_file('md5',DYNRESIZE_ROOT . $this->cfg['path']) . '.' . $this->size['output'][0] . 'x' . $this->size['output'][1] . '.jpg';
+				$this->cfg['cache'] = DYNRESIZE_CACHEDIR . basename($this->cfg['path']) . '.' . hash_file('md5',$this->cfg['path']) . '.' . $this->size['output'][0] . 'x' . $this->size['output'][1] . (DYNRESIZE_UPSCALE ? '.upscale' : '') . '.jpg';
 			}
 
 			if(file_exists($this->cfg['cache']))
@@ -326,7 +326,7 @@ class DynResize
 						$this->size['resized'] = array($this->getOutputWidth($this->size['output'][1]),$this->size['output'][1]);
 						$this->size['resized'][2] = array(($this->getOutputHeight($this->size['output'][0]) - $this->size['output'][1]) / 2,0);
 
-						if(!DYNRESIZE_SCALEUP)
+						if(!DYNRESIZE_UPSCALE)
 						{
 							// Check whether the source height is not smaller than the resized source height.
 							if($this->size['source'][1] < $this->size['resized'][1])
@@ -341,7 +341,7 @@ class DynResize
 						$this->size['resized'] = array($this->size['output'][0],$this->getOutputHeight($this->size['output'][0]));
 						$this->size['resized'][2] = array(0,($this->getOutputWidth($this->size['output'][1]) - $this->size['output'][0]) / 2);
 
-						if(!DYNRESIZE_SCALEUP)
+						if(!DYNRESIZE_UPSCALE)
 						{
 							// Check whether the source width is not smaller than the resized source width.
 							if($this->size['source'][0] < $this->size['resized'][0])
