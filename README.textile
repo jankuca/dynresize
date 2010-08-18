@@ -28,8 +28,6 @@ h2. Licence
 
 DynResize by "Jan Kuča":http://jankuca.com/ is licensed under a "Creative Commons Attribution-Share Alike 3.0 Unported License":http://creativecommons.org/licenses/by-sa/3.0/
 
-If you have any questions about the attribution, email me at jake[at]jakecooney.com.
-
 h2. Requirements
 
 * PHP 5
